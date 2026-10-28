@@ -15,14 +15,16 @@ connection.Open();
 
 Console.WriteLine($"{connection.State}");
 
-using MySqlCommand command = new MySqlCommand("SELECT name FROM boardgames;", connection);
+using MySqlCommand command = new MySqlCommand("SELECT name, stock FROM boardgames;", connection);
 
 using MySqlDataReader reader = command.ExecuteReader();
 bool isThereAnyGame = false;
 while (reader.Read())
 {
     string name = reader.GetString("name");
-    Console.WriteLine(name);
+    uint stock = reader.GetUInt32("stock");
+    string copyWord = stock == 1 ? "copy" : "copies";
+    Console.WriteLine($"{name}: {stock} {copyWord}");
     isThereAnyGame = true;
 }
 
