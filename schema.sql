@@ -1,35 +1,39 @@
-create table boardgames
+DROP TABLE IF EXISTS rentals;
+DROP TABLE IF EXISTS members;
+DROP TABLE IF EXISTS boardgames;
+
+CREATE TABLE boardgames
 (
-    id    int unsigned auto_increment
-        primary key,
-    name  varchar(64)  not null,
-    stock int unsigned not null,
-    constraint boardgames_name_unique
-        unique (name)
+    id    int unsigned AUTO_INCREMENT
+        PRIMARY KEY,
+    name  varchar(64)  NOT NULL,
+    stock int unsigned NOT NULL,
+    CONSTRAINT boardgames_name_unique
+        UNIQUE (name)
 );
 
-create table members
+CREATE TABLE members
 (
-    id       int unsigned auto_increment
-        primary key,
-    name     varchar(64)  not null,
-    address  varchar(64)  not null,
-    phone_nr varchar(20)  not null,
-    email    varchar(255) null
+    id       int unsigned AUTO_INCREMENT
+        PRIMARY KEY,
+    name     varchar(64)  NOT NULL,
+    address  varchar(64)  NOT NULL,
+    phone_nr varchar(20)  NOT NULL,
+    email    varchar(255) NULL
 );
 
-create table rentals
+CREATE TABLE rentals
 (
-    id           int unsigned auto_increment
-        primary key,
-    game_id      int unsigned not null,
-    member_id    int unsigned not null,
-    rental_start date         not null,
-    rental_end   date         not null,
-    constraint rentals_boardgames_id_fk
-        foreign key (game_id) references boardgames (id),
-    constraint rentals_members_id_fk
-        foreign key (member_id) references members (id),
-    constraint rentals_end_not_before_start
-        check (`rental_end` >= `rental_start`)
+    id           int unsigned AUTO_INCREMENT
+        PRIMARY KEY,
+    game_id      int unsigned NOT NULL,
+    member_id    int unsigned NOT NULL,
+    rental_start date         NOT NULL,
+    rental_end   date         NOT NULL,
+    CONSTRAINT rentals_boardgames_id_fk
+        FOREIGN KEY (game_id) REFERENCES boardgames (id),
+    CONSTRAINT rentals_members_id_fk
+        FOREIGN KEY (member_id) REFERENCES members (id),
+    CONSTRAINT rentals_end_not_before_start
+        CHECK (`rental_end` >= `rental_start`)
 );
