@@ -14,12 +14,14 @@ CREATE TABLE boardgames
 
 CREATE TABLE members
 (
-    id       int unsigned AUTO_INCREMENT
+    id             int unsigned AUTO_INCREMENT
         PRIMARY KEY,
-    name     varchar(64)  NOT NULL,
-    address  varchar(64)  NOT NULL,
-    phone_nr varchar(20)  NOT NULL,
-    email    varchar(255) NULL
+    name           varchar(64)  NOT NULL,
+    street_address varchar(64)  NOT NULL,
+    zip_code       varchar(10)  NOT NULL,
+    city           varchar(32)  NOT NULL,
+    phone_nr       varchar(20)  NOT NULL,
+    email          varchar(255) NULL
 );
 
 CREATE TABLE rentals
