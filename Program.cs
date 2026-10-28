@@ -21,10 +21,10 @@ using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
     bool isThereAnyGame = false;
     while (gameListReader.Read())
     {
-        string name = gameListReader.GetString("name");
-        uint stock = gameListReader.GetUInt32("stock");
-        string copyWord = stock == 1 ? "copy" : "copies";
-        Console.WriteLine($"{name}: {stock} {copyWord}");
+        string gameListName = gameListReader.GetString("name");
+        uint gameListStock = gameListReader.GetUInt32("stock");
+        string copyWord = gameListStock == 1 ? "copy" : "copies";
+        Console.WriteLine($"{gameListName}: {gameListStock} {copyWord}");
         isThereAnyGame = true;
     }
 
@@ -59,4 +59,19 @@ using (MySqlDataReader rentalListReader = rentalListCommand.ExecuteReader())
         DateOnly rentEnd = rentalListReader.GetDateOnly("rental_end");
         Console.WriteLine($"{memberName} rented {boardGameName}, {rentStart} to {rentEnd}");
     }
+}
+
+using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
+string name = "Ticket to Ride: Europe's Edition";
+uint stock = 3;
+addGameCommand.Parameters.AddWithValue("@name", name);
+addGameCommand.Parameters.AddWithValue("@stock", stock);
+try
+{
+    addGameCommand.ExecuteNonQuery();
+    Console.WriteLine($"{name} has been added in the list!");
+}
+catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+{
+    Console.WriteLine($"{name} is already in the list.");
 }
