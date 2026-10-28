@@ -10,25 +10,53 @@ if (string.IsNullOrWhiteSpace(connectionString))
     return;
 }
 
-using MySqlConnection connection = new MySqlConnection(connectionString);
+using MySqlConnection connection = new(connectionString);
 connection.Open();
 
-Console.WriteLine($"{connection.State}");
 
-using MySqlCommand command = new MySqlCommand("SELECT name, stock FROM boardgames;", connection);
+using MySqlCommand gameListCommand = new("SELECT name, stock FROM boardgames;", connection);
 
-using MySqlDataReader reader = command.ExecuteReader();
-bool isThereAnyGame = false;
-while (reader.Read())
+using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
 {
-    string name = reader.GetString("name");
-    uint stock = reader.GetUInt32("stock");
-    string copyWord = stock == 1 ? "copy" : "copies";
-    Console.WriteLine($"{name}: {stock} {copyWord}");
-    isThereAnyGame = true;
+    bool isThereAnyGame = false;
+    while (gameListReader.Read())
+    {
+        string name = gameListReader.GetString("name");
+        uint stock = gameListReader.GetUInt32("stock");
+        string copyWord = stock == 1 ? "copy" : "copies";
+        Console.WriteLine($"{name}: {stock} {copyWord}");
+        isThereAnyGame = true;
+    }
+
+    if (!isThereAnyGame)
+    {
+        Console.WriteLine("No games found.");
+    }
 }
 
-if (!isThereAnyGame)
+using MySqlCommand rentalListCommand = new(
+    """
+    SELECT
+        members.name AS member_name,
+        boardgames.name AS boardgame_name,
+        rentals.rental_start,
+        rentals.rental_end
+    FROM rentals
+        JOIN boardgames ON rentals.game_id = boardgames.id
+        JOIN members ON rentals.member_id = members.id
+    ORDER BY rentals.rental_end
+    """,
+    connection
+);
+
+using (MySqlDataReader rentalListReader = rentalListCommand.ExecuteReader())
 {
-    Console.WriteLine("No games found.");
+    while (rentalListReader.Read())
+    {
+        string memberName = rentalListReader.GetString("member_name");
+        string boardGameName = rentalListReader.GetString("boardgame_name");
+        DateOnly rentStart = rentalListReader.GetDateOnly("rental_start");
+        DateOnly rentEnd = rentalListReader.GetDateOnly("rental_end");
+        Console.WriteLine($"{memberName} rented {boardGameName}, {rentStart} to {rentEnd}");
+    }
 }
