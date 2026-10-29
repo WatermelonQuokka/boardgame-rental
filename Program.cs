@@ -75,3 +75,10 @@ catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry
 {
     Console.WriteLine($"{name} is already in the list.");
 }
+
+using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
+uint id = 2;
+retireGameCommand.Parameters.AddWithValue("@id", id);
+int rowsAffected = retireGameCommand.ExecuteNonQuery();
+string successOrFailMessage = rowsAffected == 1 ? "The chosen game is retired." : "The game does not exist.";
+Console.WriteLine(successOrFailMessage);
