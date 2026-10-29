@@ -6,8 +6,9 @@ CREATE TABLE boardgames
 (
     id    int unsigned AUTO_INCREMENT
         PRIMARY KEY,
-    name  varchar(64)  NOT NULL,
-    stock int unsigned NOT NULL,
+    name  varchar(64)     NOT NULL,
+    stock int unsigned    NOT NULL,
+    is_retired boolean    NOT NULL DEFAULT FALSE,
     CONSTRAINT boardgames_name_unique
         UNIQUE (name)
 );
