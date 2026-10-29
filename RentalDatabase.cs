@@ -1,5 +1,5 @@
-using System.Reflection.Metadata.Ecma335;
 using MySqlConnector;
+
 class RentalDatabase
 {
     private readonly string _connectionString;

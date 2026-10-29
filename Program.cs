@@ -8,22 +8,11 @@ if (string.IsNullOrWhiteSpace(connectionString))
     return;
 }
 
+ConsoleUI ui = new();
 RentalDatabase rentalDatabase = new(connectionString);
 List<BoardGame> boardGames = rentalDatabase.GetActiveGames();
+ui.ShowActiveGameList(boardGames);
 
-
-if (boardGames.Count == 0)
-{
-    Console.WriteLine("No games found.");
-}
-else
-{
-    foreach (BoardGame boardGame in boardGames)
-    {
-        string copyWord = boardGame.Stock == 1 ? "copy" : "copies";
-        Console.WriteLine($"{boardGame.Name}: {boardGame.Stock} {copyWord}");
-    }
-}
 
 List<RentalDetails> rentals = rentalDatabase.GetAllRentals();
 if (rentals.Count == 0)
