@@ -1,0 +1,1 @@
+record BoardGame(uint Id, string Name, uint Stock);
