@@ -13,24 +13,32 @@ if (string.IsNullOrWhiteSpace(connectionString))
 using MySqlConnection connection = new(connectionString);
 connection.Open();
 
+using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
 
-using MySqlCommand gameListCommand = new("SELECT name, stock FROM boardgames WHERE is_retired = false;", connection);
+List<BoardGame> boardGames = new();
 
 using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
 {
-    bool isThereAnyGame = false;
     while (gameListReader.Read())
     {
-        string gameListName = gameListReader.GetString("name");
-        uint gameListStock = gameListReader.GetUInt32("stock");
-        string copyWord = gameListStock == 1 ? "copy" : "copies";
-        Console.WriteLine($"{gameListName}: {gameListStock} {copyWord}");
-        isThereAnyGame = true;
+        BoardGame boardGame = new(
+            gameListReader.GetUInt32("id"),
+            gameListReader.GetString("name"),
+            gameListReader.GetUInt32("stock"));
+        boardGames.Add(boardGame);
     }
+}
 
-    if (!isThereAnyGame)
+if (boardGames.Count == 0)
+{
+    Console.WriteLine("No games found.");
+}
+else
+{
+    foreach (BoardGame boardGame in boardGames)
     {
-        Console.WriteLine("No games found.");
+        string copyWord = boardGame.Stock == 1 ? "copy" : "copies";
+        Console.WriteLine($"{boardGame.Name}: {boardGame.Stock} {copyWord}");
     }
 }
 
