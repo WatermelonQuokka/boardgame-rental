@@ -1,6 +1,4 @@
-﻿using MySqlConnector;
-
-const string ConnectionVariableName = "BOARDGAME_RENTAL_CONNECTION";
+﻿const string ConnectionVariableName = "BOARDGAME_RENTAL_CONNECTION";
 
 string? connectionString = Environment.GetEnvironmentVariable(ConnectionVariableName);
 
@@ -9,9 +7,6 @@ if (string.IsNullOrWhiteSpace(connectionString))
     Console.WriteLine($"{ConnectionVariableName} could not be found or is invalid.");
     return;
 }
-
-using MySqlConnection connection = new(connectionString);
-connection.Open();
 
 RentalDatabase rentalDatabase = new(connectionString);
 List<BoardGame> boardGames = rentalDatabase.GetActiveGames();
@@ -51,9 +46,9 @@ string addGameMessage = addResult == AddGameResult.Success
     : $"\"{name}\" already exists in the game list.";
 Console.WriteLine(addGameMessage);
 
-using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
 uint id = 2;
-retireGameCommand.Parameters.AddWithValue("@id", id);
-int rowsAffected = retireGameCommand.ExecuteNonQuery();
-string successOrFailMessage = rowsAffected == 1 ? "The chosen game is retired." : "The game does not exist.";
-Console.WriteLine(successOrFailMessage);
+RetireGameResult retireResult = rentalDatabase.RetireGame(id);
+string retireGameMessage = retireResult == RetireGameResult.Success
+    ? "The chosen game is retired."
+    : "The game could not be found.";
+Console.WriteLine(retireGameMessage);

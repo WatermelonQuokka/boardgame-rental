@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using MySqlConnector;
 class RentalDatabase
 {
@@ -74,7 +75,7 @@ class RentalDatabase
         using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
         addGameCommand.Parameters.AddWithValue("@name", name);
         addGameCommand.Parameters.AddWithValue("@stock", stock);
-        
+
         try
         {
             addGameCommand.ExecuteNonQuery();
@@ -84,5 +85,18 @@ class RentalDatabase
         {
             return AddGameResult.AlreadyExists;
         }
+    }
+
+    public RetireGameResult RetireGame(uint id)
+    {
+        using MySqlConnection connection = new(_connectionString);
+        connection.Open();
+
+        using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
+        retireGameCommand.Parameters.AddWithValue("@id", id);
+        int rowsAffected = retireGameCommand.ExecuteNonQuery();
+        return rowsAffected == 1
+            ? RetireGameResult.Success
+            : RetireGameResult.NotFound;
     }
 }
