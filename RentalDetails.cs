@@ -1,0 +1,1 @@
+record RentalDetails(string MemberName, string BoardGameName, DateOnly RentalStart, DateOnly RentalEnd);

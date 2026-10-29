@@ -1,0 +1,5 @@
+enum AddGameResult
+{
+    Success,
+    AlreadyExists
+}

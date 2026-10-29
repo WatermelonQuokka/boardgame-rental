@@ -1,0 +1,5 @@
+enum RetireGameResult
+{
+    Success,
+    NotFound
+}

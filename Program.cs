@@ -1,6 +1,4 @@
-﻿using MySqlConnector;
-
-const string ConnectionVariableName = "BOARDGAME_RENTAL_CONNECTION";
+﻿const string ConnectionVariableName = "BOARDGAME_RENTAL_CONNECTION";
 
 string? connectionString = Environment.GetEnvironmentVariable(ConnectionVariableName);
 
@@ -10,24 +8,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
     return;
 }
 
-using MySqlConnection connection = new(connectionString);
-connection.Open();
+RentalDatabase rentalDatabase = new(connectionString);
+List<BoardGame> boardGames = rentalDatabase.GetActiveGames();
 
-using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
-
-List<BoardGame> boardGames = new();
-
-using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
-{
-    while (gameListReader.Read())
-    {
-        BoardGame boardGame = new(
-            gameListReader.GetUInt32("id"),
-            gameListReader.GetString("name"),
-            gameListReader.GetUInt32("stock"));
-        boardGames.Add(boardGame);
-    }
-}
 
 if (boardGames.Count == 0)
 {
@@ -42,51 +25,30 @@ else
     }
 }
 
-using MySqlCommand rentalListCommand = new(
-    """
-    SELECT
-        members.name AS member_name,
-        boardgames.name AS boardgame_name,
-        rentals.rental_start,
-        rentals.rental_end
-    FROM rentals
-        JOIN boardgames ON rentals.game_id = boardgames.id
-        JOIN members ON rentals.member_id = members.id
-    ORDER BY rentals.rental_end
-    """,
-    connection
-);
-
-using (MySqlDataReader rentalListReader = rentalListCommand.ExecuteReader())
+List<RentalDetails> rentals = rentalDatabase.GetAllRentals();
+if (rentals.Count == 0)
 {
-    while (rentalListReader.Read())
+    Console.WriteLine("No rentals found.");
+}
+else
+{
+    foreach (RentalDetails rental in rentals)
     {
-        string memberName = rentalListReader.GetString("member_name");
-        string boardGameName = rentalListReader.GetString("boardgame_name");
-        DateOnly rentStart = rentalListReader.GetDateOnly("rental_start");
-        DateOnly rentEnd = rentalListReader.GetDateOnly("rental_end");
-        Console.WriteLine($"{memberName} rented {boardGameName}, {rentStart} to {rentEnd}");
+        Console.WriteLine($"{rental.MemberName} rented {rental.BoardGameName}, {rental.RentalStart} to {rental.RentalEnd}");
     }
 }
 
-using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
 string name = "Ticket to Ride: Europe's Edition";
 uint stock = 3;
-addGameCommand.Parameters.AddWithValue("@name", name);
-addGameCommand.Parameters.AddWithValue("@stock", stock);
-try
-{
-    addGameCommand.ExecuteNonQuery();
-    Console.WriteLine($"{name} has been added in the list!");
-}
-catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
-{
-    Console.WriteLine($"{name} is already in the list.");
-}
+AddGameResult addResult = rentalDatabase.AddGame(name, stock);
+string addGameMessage = addResult == AddGameResult.Success
+    ? $"\"{name}\" has been added to the game list."
+    : $"\"{name}\" already exists in the game list.";
+Console.WriteLine(addGameMessage);
 
-using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
 uint id = 2;
-retireGameCommand.Parameters.AddWithValue("@id", id);
-int rowsAffected = retireGameCommand.ExecuteNonQuery();
-string successOrFailMessage = rowsAffected == 1 ? "The chosen game is retired." : "The game does not exist.";
-Console.WriteLine(successOrFailMessage);
+RetireGameResult retireResult = rentalDatabase.RetireGame(id);
+string retireGameMessage = retireResult == RetireGameResult.Success
+    ? "The chosen game is retired."
+    : "The game could not be found.";
+Console.WriteLine(retireGameMessage);
