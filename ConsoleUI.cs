@@ -1,5 +1,11 @@
 class ConsoleUI
 {
+
+    public void ShowMissingConnectionVariable(string variableName)
+    {
+        Console.WriteLine($"{variableName} could not be found or is invalid.");
+    }
+
     public void ShowActiveGameList(List<BoardGame> boardGames)
     {
         if (boardGames.Count == 0)

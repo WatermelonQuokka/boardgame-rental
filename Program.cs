@@ -2,17 +2,17 @@
 
 string? connectionString = Environment.GetEnvironmentVariable(ConnectionVariableName);
 
+ConsoleUI ui = new();
+
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-    Console.WriteLine($"{ConnectionVariableName} could not be found or is invalid.");
+    ui.ShowMissingConnectionVariable(ConnectionVariableName);
     return;
 }
 
-ConsoleUI ui = new();
 RentalDatabase rentalDatabase = new(connectionString);
 List<BoardGame> boardGames = rentalDatabase.GetActiveGames();
 ui.ShowActiveGameList(boardGames);
-
 
 List<RentalDetails> rentals = rentalDatabase.GetAllRentals();
 ui.ShowRentalList(rentals);
