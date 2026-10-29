@@ -20,10 +20,7 @@ ui.ShowRentalList(rentals);
 string name = "Ticket to Ride: Europe's Edition";
 uint stock = 3;
 AddGameResult addResult = rentalDatabase.AddGame(name, stock);
-string addGameMessage = addResult == AddGameResult.Success
-    ? $"\"{name}\" has been added to the game list."
-    : $"\"{name}\" already exists in the game list.";
-Console.WriteLine(addGameMessage);
+ui.ShowAddGameResult(addResult, name);
 
 uint id = 2;
 RetireGameResult retireResult = rentalDatabase.RetireGame(id);

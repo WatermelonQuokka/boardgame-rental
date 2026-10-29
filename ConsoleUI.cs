@@ -30,4 +30,12 @@ class ConsoleUI
             }
         }
     }
+
+    public void ShowAddGameResult(AddGameResult result, string name)
+    {
+        string addGameMessage = result == AddGameResult.Success
+            ? $"\"{name}\" has been added to the game list."
+            : $"\"{name}\" already exists in the game list.";
+        Console.WriteLine(addGameMessage);
+    }
 }
