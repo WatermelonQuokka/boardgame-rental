@@ -38,4 +38,12 @@ class ConsoleUI
             : $"\"{name}\" already exists in the game list.";
         Console.WriteLine(addGameMessage);
     }
+
+    public void ShowRetireGameResult(RetireGameResult result)
+    {
+        string retireGameMessage = result == RetireGameResult.Success
+            ? "The chosen game is retired."
+            : "The game could not be found.";
+        Console.WriteLine(retireGameMessage);
+    }
 }

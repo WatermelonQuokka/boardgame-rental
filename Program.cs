@@ -24,7 +24,4 @@ ui.ShowAddGameResult(addResult, name);
 
 uint id = 2;
 RetireGameResult retireResult = rentalDatabase.RetireGame(id);
-string retireGameMessage = retireResult == RetireGameResult.Success
-    ? "The chosen game is retired."
-    : "The game could not be found.";
-Console.WriteLine(retireGameMessage);
+ui.ShowRetireGameResult(retireResult);
