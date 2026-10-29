@@ -30,33 +30,18 @@ else
     }
 }
 
-using MySqlCommand rentalListCommand = new(
-    """
-    SELECT
-        members.name AS member_name,
-        boardgames.name AS boardgame_name,
-        rentals.rental_start,
-        rentals.rental_end
-    FROM rentals
-        JOIN boardgames ON rentals.game_id = boardgames.id
-        JOIN members ON rentals.member_id = members.id
-    ORDER BY rentals.rental_end
-    """,
-    connection
-);
-
-using (MySqlDataReader rentalListReader = rentalListCommand.ExecuteReader())
+List<RentalDetails> rentals = rentalDatabase.GetAllRentals();
+if (rentals.Count == 0)
 {
-    while (rentalListReader.Read())
+    Console.WriteLine("No rentals found.");
+}
+else
+{
+    foreach (RentalDetails rental in rentals)
     {
-        string memberName = rentalListReader.GetString("member_name");
-        string boardGameName = rentalListReader.GetString("boardgame_name");
-        DateOnly rentStart = rentalListReader.GetDateOnly("rental_start");
-        DateOnly rentEnd = rentalListReader.GetDateOnly("rental_end");
-        Console.WriteLine($"{memberName} rented {boardGameName}, {rentStart} to {rentEnd}");
+        Console.WriteLine($"{rental.MemberName} rented {rental.BoardGameName}, {rental.RentalStart} to {rental.RentalEnd}");
     }
 }
-
 using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
 string name = "Ticket to Ride: Europe's Edition";
 uint stock = 3;
