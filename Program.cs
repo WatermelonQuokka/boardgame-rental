@@ -13,21 +13,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
 using MySqlConnection connection = new(connectionString);
 connection.Open();
 
-using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
+RentalDatabase rentalDatabase = new(connectionString);
+List<BoardGame> boardGames = rentalDatabase.GetActiveGames();
 
-List<BoardGame> boardGames = new();
-
-using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
-{
-    while (gameListReader.Read())
-    {
-        BoardGame boardGame = new(
-            gameListReader.GetUInt32("id"),
-            gameListReader.GetString("name"),
-            gameListReader.GetUInt32("stock"));
-        boardGames.Add(boardGame);
-    }
-}
 
 if (boardGames.Count == 0)
 {
