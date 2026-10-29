@@ -15,4 +15,19 @@ class ConsoleUI
             }
         }
     }
+
+    public void ShowRentalList(List<RentalDetails> rentals)
+    {
+        if (rentals.Count == 0)
+        {
+            Console.WriteLine("No rentals found.");
+        }
+        else
+        {
+            foreach (RentalDetails rental in rentals)
+            {
+                Console.WriteLine($"{rental.MemberName} rented {rental.BoardGameName}, {rental.RentalStart} to {rental.RentalEnd}");
+            }
+        }
+    }
 }

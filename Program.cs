@@ -15,17 +15,7 @@ ui.ShowActiveGameList(boardGames);
 
 
 List<RentalDetails> rentals = rentalDatabase.GetAllRentals();
-if (rentals.Count == 0)
-{
-    Console.WriteLine("No rentals found.");
-}
-else
-{
-    foreach (RentalDetails rental in rentals)
-    {
-        Console.WriteLine($"{rental.MemberName} rented {rental.BoardGameName}, {rental.RentalStart} to {rental.RentalEnd}");
-    }
-}
+ui.ShowRentalList(rentals);
 
 string name = "Ticket to Ride: Europe's Edition";
 uint stock = 3;
