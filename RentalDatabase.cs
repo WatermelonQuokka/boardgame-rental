@@ -9,12 +9,18 @@ class RentalDatabase
         _connectionString = connectionString;
     }
 
+    private MySqlConnection OpenConnection()
+    {
+        MySqlConnection connection = new(_connectionString);
+        connection.Open();
+        return connection;
+    }
+
     public List<BoardGame> GetActiveGames()
     {
         List<BoardGame> boardGames = new();
 
-        using MySqlConnection connection = new(_connectionString);
-        connection.Open();
+        using MySqlConnection connection = OpenConnection();
 
         using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
         using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
@@ -35,8 +41,7 @@ class RentalDatabase
     {
         List<RentalDetails> rentals = new();
 
-        using MySqlConnection connection = new(_connectionString);
-        connection.Open();
+        using MySqlConnection connection = OpenConnection();
 
         using MySqlCommand rentalListCommand = new(
             """
@@ -69,8 +74,7 @@ class RentalDatabase
 
     public AddGameResult AddGame(string name, uint stock)
     {
-        using MySqlConnection connection = new(_connectionString);
-        connection.Open();
+        using MySqlConnection connection = OpenConnection();
 
         using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
         addGameCommand.Parameters.AddWithValue("@name", name);
@@ -89,8 +93,7 @@ class RentalDatabase
 
     public RetireGameResult RetireGame(uint id)
     {
-        using MySqlConnection connection = new(_connectionString);
-        connection.Open();
+        using MySqlConnection connection = OpenConnection();
 
         using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
         retireGameCommand.Parameters.AddWithValue("@id", id);
