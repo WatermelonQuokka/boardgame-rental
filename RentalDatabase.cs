@@ -65,4 +65,24 @@ class RentalDatabase
         }
         return rentals;
     }
+
+    public AddGameResult AddGame(string name, uint stock)
+    {
+        using MySqlConnection connection = new(_connectionString);
+        connection.Open();
+
+        using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
+        addGameCommand.Parameters.AddWithValue("@name", name);
+        addGameCommand.Parameters.AddWithValue("@stock", stock);
+        
+        try
+        {
+            addGameCommand.ExecuteNonQuery();
+            return AddGameResult.Success;
+        }
+        catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+        {
+            return AddGameResult.AlreadyExists;
+        }
+    }
 }

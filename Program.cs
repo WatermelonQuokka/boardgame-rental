@@ -42,20 +42,14 @@ else
         Console.WriteLine($"{rental.MemberName} rented {rental.BoardGameName}, {rental.RentalStart} to {rental.RentalEnd}");
     }
 }
-using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
+
 string name = "Ticket to Ride: Europe's Edition";
 uint stock = 3;
-addGameCommand.Parameters.AddWithValue("@name", name);
-addGameCommand.Parameters.AddWithValue("@stock", stock);
-try
-{
-    addGameCommand.ExecuteNonQuery();
-    Console.WriteLine($"{name} has been added in the list!");
-}
-catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
-{
-    Console.WriteLine($"{name} is already in the list.");
-}
+AddGameResult addResult = rentalDatabase.AddGame(name, stock);
+string addGameMessage = addResult == AddGameResult.Success
+    ? $"\"{name}\" has been added to the game list."
+    : $"\"{name}\" already exists in the game list.";
+Console.WriteLine(addGameMessage);
 
 using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
 uint id = 2;
