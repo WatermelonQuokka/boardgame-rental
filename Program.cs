@@ -14,7 +14,7 @@ using MySqlConnection connection = new(connectionString);
 connection.Open();
 
 
-using MySqlCommand gameListCommand = new("SELECT name, stock FROM boardgames;", connection);
+using MySqlCommand gameListCommand = new("SELECT name, stock FROM boardgames WHERE is_retired = false;", connection);
 
 using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
 {
