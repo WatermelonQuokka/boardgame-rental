@@ -1,5 +1,6 @@
 class ConsoleUI
 {
+    private string? _lastMessage;
 
     public void ShowMissingConnectionVariable(string variableName)
     {
@@ -14,12 +15,14 @@ class ConsoleUI
         }
         else
         {
+            Console.WriteLine("=== Active Games ===");
             foreach (BoardGame boardGame in boardGames)
             {
                 string copyWord = boardGame.Stock == 1 ? "copy" : "copies";
                 Console.WriteLine($"{boardGame.Name}: {boardGame.Stock} {copyWord}");
             }
         }
+        PauseBeforeMenu();
     }
 
     public void ShowRentalList(List<RentalDetails> rentals)
@@ -30,11 +33,13 @@ class ConsoleUI
         }
         else
         {
+            Console.WriteLine("=== Rental List ===");
             foreach (RentalDetails rental in rentals)
             {
                 Console.WriteLine($"{rental.MemberName} rented {rental.BoardGameName}, {rental.RentalStart} to {rental.RentalEnd}");
             }
         }
+        PauseBeforeMenu();
     }
 
     public void ShowAddGameResult(AddGameResult result, string name)
@@ -42,7 +47,7 @@ class ConsoleUI
         string addGameMessage = result == AddGameResult.Success
             ? $"\"{name}\" has been added to the game list."
             : $"\"{name}\" already exists in the game list.";
-        Console.WriteLine(addGameMessage);
+        _lastMessage = addGameMessage;
     }
 
     public void ShowRetireGameResult(RetireGameResult result)
@@ -50,6 +55,52 @@ class ConsoleUI
         string retireGameMessage = result == RetireGameResult.Success
             ? "The chosen game is retired."
             : "The game could not be found.";
-        Console.WriteLine(retireGameMessage);
+        _lastMessage = retireGameMessage;
+    }
+
+    public MenuChoice AskForMenuChoice()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine(_lastMessage);
+            _lastMessage = null;
+            ShowMenu();
+            Console.Write("Choose an option: ");
+            string? input = Console.ReadLine();
+            if (input == null)
+            {
+                throw new EndOfStreamException("The option could not be read.");
+            }
+            if (int.TryParse(input, out int number)
+                && Enum.IsDefined(typeof(MenuChoice), number))
+            {
+                return (MenuChoice)number;
+            }
+            else
+            {
+                _lastMessage = "Invalid option choice.";
+            }
+        }
+    }
+
+    private void ShowMenu()
+    {
+        Console.WriteLine(
+            """
+
+            === Board Game Rental ===
+            1. Show games
+            2. Show rentals
+            3. Add a game
+            4. Retire a game
+            0. Quit
+            """);
+    }
+
+    private void PauseBeforeMenu()
+    {
+        Console.WriteLine("Press any key to return to the menu.");
+        Console.ReadKey(true);
     }
 }

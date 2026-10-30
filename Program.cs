@@ -11,17 +11,36 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 
 IRentalRepository repository = new MySqlRentalRepository(connectionString);
-List<BoardGame> boardGames = repository.GetActiveGames();
-ui.ShowActiveGameList(boardGames);
-
-List<RentalDetails> rentals = repository.GetAllRentals();
-ui.ShowRentalList(rentals);
-
-string name = "Ticket to Ride: Europe's Edition";
-uint stock = 3;
-AddGameResult addResult = repository.AddGame(name, stock);
-ui.ShowAddGameResult(addResult, name);
-
-uint id = 2;
-RetireGameResult retireResult = repository.RetireGame(id);
-ui.ShowRetireGameResult(retireResult);
+bool isRunning = true;
+while (isRunning)
+{
+    MenuChoice choice = ui.AskForMenuChoice();
+    switch (choice)
+    {
+        case MenuChoice.ShowGames:
+            List<BoardGame> boardGames = repository.GetActiveGames();
+            ui.ShowActiveGameList(boardGames);
+            break;
+        case MenuChoice.ShowRentals:
+            List<RentalDetails> rentals = repository.GetAllRentals();
+            ui.ShowRentalList(rentals);
+            break;
+        case MenuChoice.AddGame:
+            string name = "Ticket to Ride: Europe's Edition";
+            uint stock = 3;
+            AddGameResult addResult = repository.AddGame(name, stock);
+            ui.ShowAddGameResult(addResult, name);
+            break;
+        case MenuChoice.RetireGame:
+            uint id = 2;
+            RetireGameResult retireResult = repository.RetireGame(id);
+            ui.ShowRetireGameResult(retireResult);
+            break;
+        case MenuChoice.Quit:
+            isRunning = false;
+            break;
+        default:
+            throw new ArgumentOutOfRangeException(
+                nameof(choice), choice, "Unknown choice.");
+    }
+}
