@@ -10,18 +10,18 @@ if (string.IsNullOrWhiteSpace(connectionString))
     return;
 }
 
-RentalDatabase rentalDatabase = new(connectionString);
-List<BoardGame> boardGames = rentalDatabase.GetActiveGames();
+IRentalRepository repository = new MySqlRentalRepository(connectionString);
+List<BoardGame> boardGames = repository.GetActiveGames();
 ui.ShowActiveGameList(boardGames);
 
-List<RentalDetails> rentals = rentalDatabase.GetAllRentals();
+List<RentalDetails> rentals = repository.GetAllRentals();
 ui.ShowRentalList(rentals);
 
 string name = "Ticket to Ride: Europe's Edition";
 uint stock = 3;
-AddGameResult addResult = rentalDatabase.AddGame(name, stock);
+AddGameResult addResult = repository.AddGame(name, stock);
 ui.ShowAddGameResult(addResult, name);
 
 uint id = 2;
-RetireGameResult retireResult = rentalDatabase.RetireGame(id);
+RetireGameResult retireResult = repository.RetireGame(id);
 ui.ShowRetireGameResult(retireResult);

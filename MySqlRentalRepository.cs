@@ -1,10 +1,10 @@
 using MySqlConnector;
 
-class RentalDatabase
+class MySqlRentalRepository : IRentalRepository
 {
     private readonly string _connectionString;
 
-    public RentalDatabase(string connectionString)
+    public MySqlRentalRepository(string connectionString)
     {
         _connectionString = connectionString;
     }
