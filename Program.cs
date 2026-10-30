@@ -26,7 +26,7 @@ while (isRunning)
             ui.ShowRentalList(rentals);
             break;
         case MenuChoice.AddGame:
-            string name = "Ticket to Ride: Europe's Edition";
+            string name = ui.AskForGameName();
             uint stock = 3;
             AddGameResult addResult = repository.AddGame(name, stock);
             ui.ShowAddGameResult(addResult, name);

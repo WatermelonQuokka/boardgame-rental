@@ -1,6 +1,9 @@
+using System.Xml;
+
 class ConsoleUI
 {
     private string? _lastMessage;
+    private const int GameNameLimit = 64;
 
     public void ShowMissingConnectionVariable(string variableName)
     {
@@ -67,11 +70,7 @@ class ConsoleUI
             _lastMessage = null;
             ShowMenu();
             Console.Write("Choose an option: ");
-            string? input = Console.ReadLine();
-            if (input == null)
-            {
-                throw new EndOfStreamException("The option could not be read.");
-            }
+            string input = ReadInput();
             if (int.TryParse(input, out int number)
                 && Enum.IsDefined(typeof(MenuChoice), number))
             {
@@ -102,5 +101,36 @@ class ConsoleUI
     {
         Console.WriteLine("Press any key to return to the menu.");
         Console.ReadKey(true);
+    }
+
+    public string AskForGameName()
+    {
+        while (true)
+        {
+            Console.Write("Game name: ");
+            string input = ReadInput();
+            if (input.Length == 0)
+            {
+                Console.WriteLine("Please enter a name.");
+            }
+            else if (input.Length > GameNameLimit)
+            {
+                Console.WriteLine($"The name is {input.Length} characters long. The maximum is {GameNameLimit}.");
+            }
+            else
+            {
+                return input;
+            }
+        }
+    }
+
+    private string ReadInput()
+    {
+        string? input = Console.ReadLine();
+        if (input == null)
+        {
+            throw new EndOfStreamException("The input could not be read.");
+        }
+        return input.Trim();
     }
 }
