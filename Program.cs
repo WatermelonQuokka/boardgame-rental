@@ -27,7 +27,7 @@ while (isRunning)
             break;
         case MenuChoice.AddGame:
             string name = ui.AskForGameName();
-            uint stock = 3;
+            uint stock = ui.AskForStock();
             AddGameResult addResult = repository.AddGame(name, stock);
             ui.ShowAddGameResult(addResult, name);
             break;

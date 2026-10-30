@@ -4,6 +4,7 @@ class ConsoleUI
 {
     private string? _lastMessage;
     private const int GameNameLimit = 64;
+    private const int MinimumStockLimit = 1;
 
     public void ShowMissingConnectionVariable(string variableName)
     {
@@ -132,5 +133,26 @@ class ConsoleUI
             throw new EndOfStreamException("The input could not be read.");
         }
         return input.Trim();
+    }
+
+    public uint AskForStock()
+    {
+        while (true)
+        {
+            Console.Write("Game stock: ");
+            string input = ReadInput();
+            if (!uint.TryParse(input, out uint stock))
+            {
+                Console.WriteLine("Please enter a whole positive number.");
+            }
+            else if (stock < MinimumStockLimit)
+            {
+                Console.WriteLine($"Stock needs to be at least {MinimumStockLimit}.");
+            }
+            else
+            {
+                return stock;
+            }
+        }
     }
 }
