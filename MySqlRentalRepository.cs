@@ -15,12 +15,6 @@ class MySqlRentalRepository : IRentalRepository
         await connection.OpenAsync();
         return connection;
     }
-    private MySqlConnection OpenConnection()
-    {
-        MySqlConnection connection = new(_connectionString);
-        connection.Open();
-        return connection;
-    }
 
     public async Task<List<BoardGame>> GetActiveGamesAsync()
     {
@@ -97,13 +91,13 @@ class MySqlRentalRepository : IRentalRepository
         }
     }
 
-    public RetireGameResult RetireGame(uint id)
+    public async Task<RetireGameResult> RetireGameAsync(uint id)
     {
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
+        await using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
         retireGameCommand.Parameters.AddWithValue("@id", id);
-        int rowsAffected = retireGameCommand.ExecuteNonQuery();
+        int rowsAffected = await retireGameCommand.ExecuteNonQueryAsync();
         return rowsAffected == 1
             ? RetireGameResult.Success
             : RetireGameResult.NotFound;

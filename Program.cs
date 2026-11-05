@@ -33,7 +33,7 @@ while (isRunning)
             break;
         case MenuChoice.RetireGame:
             uint id = 2;
-            RetireGameResult retireResult = repository.RetireGame(id);
+            RetireGameResult retireResult = await repository.RetireGameAsync(id);
             ui.ShowRetireGameResult(retireResult);
             break;
         case MenuChoice.Quit:
