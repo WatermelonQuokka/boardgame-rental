@@ -9,6 +9,12 @@ class MySqlRentalRepository : IRentalRepository
         _connectionString = connectionString;
     }
 
+    private async Task<MySqlConnection> OpenConnectionAsync()
+    {
+        MySqlConnection connection = new(_connectionString);
+        await connection.OpenAsync();
+        return connection;
+    }
     private MySqlConnection OpenConnection()
     {
         MySqlConnection connection = new(_connectionString);
@@ -16,16 +22,16 @@ class MySqlRentalRepository : IRentalRepository
         return connection;
     }
 
-    public List<BoardGame> GetActiveGames()
+    public async Task<List<BoardGame>> GetActiveGamesAsync()
     {
         List<BoardGame> boardGames = new();
 
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
-        using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
+        await using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
+        await using (MySqlDataReader gameListReader = await gameListCommand.ExecuteReaderAsync())
         {
-            while (gameListReader.Read())
+            while (await gameListReader.ReadAsync())
             {
                 BoardGame boardGame = new(
                     gameListReader.GetUInt32("id"),

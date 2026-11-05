@@ -18,7 +18,7 @@ while (isRunning)
     switch (choice)
     {
         case MenuChoice.ShowGames:
-            List<BoardGame> boardGames = repository.GetActiveGames();
+            List<BoardGame> boardGames = await repository.GetActiveGamesAsync();
             ui.ShowActiveGameList(boardGames);
             break;
         case MenuChoice.ShowRentals:
