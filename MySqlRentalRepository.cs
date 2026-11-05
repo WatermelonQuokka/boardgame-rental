@@ -43,13 +43,13 @@ class MySqlRentalRepository : IRentalRepository
         return boardGames;
     }
 
-    public List<RentalDetails> GetAllRentals()
+    public async Task<List<RentalDetails>> GetAllRentalsAsync()
     {
         List<RentalDetails> rentals = new();
 
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand rentalListCommand = new(
+        await using MySqlCommand rentalListCommand = new(
             """
             SELECT
                 members.name AS member_name,
@@ -63,9 +63,9 @@ class MySqlRentalRepository : IRentalRepository
             """,
             connection);
 
-        using (MySqlDataReader rentalListReader = rentalListCommand.ExecuteReader())
+        await using (MySqlDataReader rentalListReader = await rentalListCommand.ExecuteReaderAsync())
         {
-            while (rentalListReader.Read())
+            while (await rentalListReader.ReadAsync())
             {
                 RentalDetails rental = new(
                     rentalListReader.GetString("member_name"),

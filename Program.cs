@@ -22,7 +22,7 @@ while (isRunning)
             ui.ShowActiveGameList(boardGames);
             break;
         case MenuChoice.ShowRentals:
-            List<RentalDetails> rentals = repository.GetAllRentals();
+            List<RentalDetails> rentals = await repository.GetAllRentalsAsync();
             ui.ShowRentalList(rentals);
             break;
         case MenuChoice.AddGame:
