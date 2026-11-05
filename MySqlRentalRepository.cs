@@ -9,23 +9,23 @@ class MySqlRentalRepository : IRentalRepository
         _connectionString = connectionString;
     }
 
-    private MySqlConnection OpenConnection()
+    private async Task<MySqlConnection> OpenConnectionAsync()
     {
         MySqlConnection connection = new(_connectionString);
-        connection.Open();
+        await connection.OpenAsync();
         return connection;
     }
 
-    public List<BoardGame> GetActiveGames()
+    public async Task<List<BoardGame>> GetActiveGamesAsync()
     {
         List<BoardGame> boardGames = new();
 
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
-        using (MySqlDataReader gameListReader = gameListCommand.ExecuteReader())
+        await using MySqlCommand gameListCommand = new("SELECT id, name, stock FROM boardgames WHERE is_retired = false;", connection);
+        await using (MySqlDataReader gameListReader = await gameListCommand.ExecuteReaderAsync())
         {
-            while (gameListReader.Read())
+            while (await gameListReader.ReadAsync())
             {
                 BoardGame boardGame = new(
                     gameListReader.GetUInt32("id"),
@@ -37,13 +37,13 @@ class MySqlRentalRepository : IRentalRepository
         return boardGames;
     }
 
-    public List<RentalDetails> GetAllRentals()
+    public async Task<List<RentalDetails>> GetAllRentalsAsync()
     {
         List<RentalDetails> rentals = new();
 
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand rentalListCommand = new(
+        await using MySqlCommand rentalListCommand = new(
             """
             SELECT
                 members.name AS member_name,
@@ -57,9 +57,9 @@ class MySqlRentalRepository : IRentalRepository
             """,
             connection);
 
-        using (MySqlDataReader rentalListReader = rentalListCommand.ExecuteReader())
+        await using (MySqlDataReader rentalListReader = await rentalListCommand.ExecuteReaderAsync())
         {
-            while (rentalListReader.Read())
+            while (await rentalListReader.ReadAsync())
             {
                 RentalDetails rental = new(
                     rentalListReader.GetString("member_name"),
@@ -72,17 +72,17 @@ class MySqlRentalRepository : IRentalRepository
         return rentals;
     }
 
-    public AddGameResult AddGame(string name, uint stock)
+    public async Task<AddGameResult> AddGameAsync(string name, uint stock)
     {
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
+        await using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
         addGameCommand.Parameters.AddWithValue("@name", name);
         addGameCommand.Parameters.AddWithValue("@stock", stock);
 
         try
         {
-            addGameCommand.ExecuteNonQuery();
+            await addGameCommand.ExecuteNonQueryAsync();
             return AddGameResult.Success;
         }
         catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
@@ -91,13 +91,13 @@ class MySqlRentalRepository : IRentalRepository
         }
     }
 
-    public RetireGameResult RetireGame(uint id)
+    public async Task<RetireGameResult> RetireGameAsync(uint id)
     {
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
+        await using MySqlCommand retireGameCommand = new("UPDATE boardgames SET is_retired = true WHERE id = @id;", connection);
         retireGameCommand.Parameters.AddWithValue("@id", id);
-        int rowsAffected = retireGameCommand.ExecuteNonQuery();
+        int rowsAffected = await retireGameCommand.ExecuteNonQueryAsync();
         return rowsAffected == 1
             ? RetireGameResult.Success
             : RetireGameResult.NotFound;
