@@ -18,22 +18,22 @@ while (isRunning)
     switch (choice)
     {
         case MenuChoice.ShowGames:
-            List<BoardGame> boardGames = repository.GetActiveGames();
+            List<BoardGame> boardGames = await repository.GetActiveGamesAsync();
             ui.ShowActiveGameList(boardGames);
             break;
         case MenuChoice.ShowRentals:
-            List<RentalDetails> rentals = repository.GetAllRentals();
+            List<RentalDetails> rentals = await repository.GetAllRentalsAsync();
             ui.ShowRentalList(rentals);
             break;
         case MenuChoice.AddGame:
             string name = "Ticket to Ride: Europe's Edition";
             uint stock = 3;
-            AddGameResult addResult = repository.AddGame(name, stock);
+            AddGameResult addResult = await repository.AddGameAsync(name, stock);
             ui.ShowAddGameResult(addResult, name);
             break;
         case MenuChoice.RetireGame:
             uint id = 2;
-            RetireGameResult retireResult = repository.RetireGame(id);
+            RetireGameResult retireResult = await repository.RetireGameAsync(id);
             ui.ShowRetireGameResult(retireResult);
             break;
         case MenuChoice.Quit:

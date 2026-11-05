@@ -1,7 +1,7 @@
 interface IRentalRepository
 {
-    List<BoardGame> GetActiveGames();
-    List<RentalDetails> GetAllRentals();
-    AddGameResult AddGame(string name, uint stock);
-    RetireGameResult RetireGame(uint id);
+    Task<List<BoardGame>> GetActiveGamesAsync();
+    Task<List<RentalDetails>> GetAllRentalsAsync();
+    Task<AddGameResult> AddGameAsync(string name, uint stock);
+    Task<RetireGameResult> RetireGameAsync(uint id);
 }
