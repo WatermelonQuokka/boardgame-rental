@@ -78,17 +78,17 @@ class MySqlRentalRepository : IRentalRepository
         return rentals;
     }
 
-    public AddGameResult AddGame(string name, uint stock)
+    public async Task<AddGameResult> AddGameAsync(string name, uint stock)
     {
-        using MySqlConnection connection = OpenConnection();
+        await using MySqlConnection connection = await OpenConnectionAsync();
 
-        using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
+        await using MySqlCommand addGameCommand = new("INSERT INTO boardgames (name, stock) VALUES (@name, @stock);", connection);
         addGameCommand.Parameters.AddWithValue("@name", name);
         addGameCommand.Parameters.AddWithValue("@stock", stock);
 
         try
         {
-            addGameCommand.ExecuteNonQuery();
+            await addGameCommand.ExecuteNonQueryAsync();
             return AddGameResult.Success;
         }
         catch (MySqlException ex) when (ex.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)

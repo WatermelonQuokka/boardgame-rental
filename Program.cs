@@ -28,7 +28,7 @@ while (isRunning)
         case MenuChoice.AddGame:
             string name = "Ticket to Ride: Europe's Edition";
             uint stock = 3;
-            AddGameResult addResult = repository.AddGame(name, stock);
+            AddGameResult addResult = await repository.AddGameAsync(name, stock);
             ui.ShowAddGameResult(addResult, name);
             break;
         case MenuChoice.RetireGame:
